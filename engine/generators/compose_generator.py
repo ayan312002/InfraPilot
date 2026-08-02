@@ -2,13 +2,14 @@ from pathlib import Path
 
 import yaml
 
+from engine.generators.base_generator import BaseGenerator
 from engine.models.provisioning_spec import ProvisioningSpec
 from engine.models.service_spec import ServiceSpec
 
 
-class ComposeGenerator:
+class ComposeGenerator(BaseGenerator):
 
-    def generate_compose(self, spec: ProvisioningSpec) -> str:
+    def generate(self, spec: ProvisioningSpec) -> str:
         """
         Convert a ProvisioningSpec into a docker-compose YAML string.
         """
@@ -66,4 +67,9 @@ class ComposeGenerator:
         Save generated YAML to disk.
         """
 
-        Path(output_path).write_text(yaml_content)
+        file_path = Path(output_path)
+
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(yaml_content)
+
+        return output_path

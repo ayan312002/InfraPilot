@@ -1,30 +1,32 @@
+from pathlib import Path
+
 from engine.generators.compose_generator import ComposeGenerator
 from engine.models.provisioning_spec import ProvisioningSpec
 from engine.models.service_spec import ServiceSpec
 
-spec = ProvisioningSpec(
-    project_name="demo",
-    services=[
-        ServiceSpec(
-            name="postgres",
-            image="postgres:16",
-            ports=["5432:5432"]
-        ),
-        ServiceSpec(
-            name="redis",
-            image="redis:7",
-            ports=["6379:6379"]
-        )
-    ]
-)
+from engine.runner import ProvisionRunner
+from engine.utils.spec_loader import SpecLoader
 
-generator = ComposeGenerator()
+import json
 
-yaml_content = generator.generate_compose(spec)
 
-print(yaml_content)
+def main():
+    spec = SpecLoader.load("examples/postgres_redis.json")
 
-generator.save(
-    yaml_content,
-    "generated/docker-compose.yml"
-)
+    runner = ProvisionRunner()
+
+    result = runner.run(spec)
+
+    print()
+
+    print("Compose Path :", result["compose_yaml_path"])
+    print("Valid        :", result["validation"].success)
+
+    if result["validation"].errors:
+        print()
+        print("Errors:")
+        for error in result["validation"].errors:
+            print(error)
+
+if __name__ == "__main__":
+    main()

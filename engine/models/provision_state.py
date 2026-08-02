@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from engine.models.provisioning_spec import ProvisioningSpec
+from engine.models.validation_result import ValidationResult
 
 class ProvisionState(BaseModel):
     user_request: str
@@ -8,7 +9,6 @@ class ProvisionState(BaseModel):
 
     compose_yaml: str | None = None
 
-    validation_passed: bool = False
-    validation_errors: list[str] = Field(default_factory=list)
+    validation_result: bool = ValidationResult
 
     execution_logs: list[str] = Field(default_factory=list)

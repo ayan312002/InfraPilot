@@ -1,0 +1,12 @@
+{
+  "project_name": "demo",
+  "services": [
+    {
+      "name": "web",
+      "image": "nginx:latest",
+      "ports": [
+        "8080:80"
+      ]
+    }
+  ]
+}
