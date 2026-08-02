@@ -16,7 +16,7 @@ python main.py "I need a FastAPI backend with PostgreSQL and Redis"
 4. **Human Approval** - Confirm from the user if the generated docker compose matches the user's requirement, additionally provide the option to make further changes which will forward it to Requirement Agent
 5. **Execution Agent** - Upon user's approval, run `docker compose up -d` to up the services
 
-![Architecture Diagram](./architechture.svg)
+![Architecture Diagram](./docs/diagrams/architechture.svg)
 
 ### Future Plans:
 - Frontend UI for a simple dashboard for demonstration
