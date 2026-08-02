@@ -15,7 +15,7 @@ class ComposeGenerator(BaseGenerator):
         """
 
         compose = {
-            "name": spec.project_name,
+            "name": "demo",
             "services": {}
         }
 

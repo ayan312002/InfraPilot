@@ -22,3 +22,4 @@ python main.py "I need a FastAPI backend with PostgreSQL and Redis"
 - Frontend UI for a simple dashboard for demonstration
 - Instead of running docker services locally, run the commands remotely (maybe have an option to define the endpoints for Docker Engine API?)
 - Change the scope from Docker to a IaC like Terraform
+- Add tooling to provide docker images to choose from

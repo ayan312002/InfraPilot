@@ -1,4 +1,5 @@
 from pathlib import Path
+import uuid
 
 from engine.generators.compose_generator import ComposeGenerator
 from engine.validators.compose_validator import ComposeValidator
@@ -18,7 +19,7 @@ class ProvisionRunner:
 
         compose_yaml_path = self.generator.save(
             compose_yaml_string,
-            f"generated/{spec.project_name}/docker-compose.yml"
+            f"generated/{uuid.uuid4().hex[:6]}/docker-compose.yml"
         )
 
         return {
