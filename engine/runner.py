@@ -11,7 +11,6 @@ class ProvisionRunner:
 
     def run(self, state: ProvisionState) -> ProvisionState:
         state = self.prepare_workspace(state)
-
         return self.graph.run(state)
 
     def prepare_workspace(self, state: ProvisionState):

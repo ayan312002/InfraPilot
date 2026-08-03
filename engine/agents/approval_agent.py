@@ -17,8 +17,21 @@ class ApprovalManager:
         print(f"\nGenerated file: {state.generated_config_path}")
         print(f"Validation: {state.validation_result.success}")
 
-        answer = input("\nProceed? (y/n): ")
+        print("1. Approve")
+        print("2. Modify")
+        print("3. Cancel")
+        
+        choice = input("\nChoice: ")
 
-        state.approved = answer.lower() == "y"
+        if choice == "1":
+            state.approved = True
+
+        elif choice == "2":
+            state.feedback = input(
+                "\nWhat would you like to change?\n> "
+            )
+
+        else:
+            state.approved = False
 
         return state

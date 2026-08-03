@@ -44,6 +44,9 @@ class InfraPilotWorkflow:
             if state.approved:
                 return "execute"
 
+            if state.feedback:
+                return "requirement"
+
             return END
         
         workflow = StateGraph(ProvisionState)
@@ -76,4 +79,4 @@ class InfraPilotWorkflow:
         self,
         state: ProvisionState
     ) -> ProvisionState:
-        return self._graph.invoke(state)
+        return ProvisionState.model_validate(self._graph.invoke(state))

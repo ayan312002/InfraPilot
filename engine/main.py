@@ -1,20 +1,13 @@
 from engine.models.provision_state import ProvisionState
 from engine.runner import ProvisionRunner
 
-
-def main():
+def print_banner():
     print("=" * 60)
     print("InfraPilot")
     print("Natural Language Infrastructure Provisioning")
     print("=" * 60)
 
-    request = input("\nDescribe your infrastructure:\n> ")
-
-    state = ProvisionState(user_request=request)
-
-    runner = ProvisionRunner()
-    state = runner.run(state)
-
+def print_summary(state):
     print("\n" + "=" * 60)
     print("Provisioning Summary")
     print("=" * 60)
@@ -23,6 +16,18 @@ def main():
     print(f"Compose File: {state.generated_config_path}")
     print(f"Validation:   {'✓ Passed' if state.validation_result.success else '✗ Failed'}")
     print(f"Approved:     {'Yes' if state.approved else 'No'}")
+
+def main():
+    print_banner()
+
+    request = input("\nDescribe your infrastructure:\n> ")
+
+    state = ProvisionState(user_request=request)
+
+    runner = ProvisionRunner()
+    state = runner.run(state)
+
+    print_summary(state)
 
     if state.validation_result.errors:
         print("\nValidation Errors:")
@@ -34,8 +39,7 @@ def main():
         for error in state.execution_result.errors:
             print(f"  • {error}")
 
-
-    print("\nDone.")
+    print("Done.")
 
 
 if __name__ == "__main__":
