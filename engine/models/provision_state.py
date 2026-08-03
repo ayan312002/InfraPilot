@@ -17,6 +17,8 @@ class ProvisionStatus(str, Enum):
 class ProvisionState(BaseModel):
     user_request: str
 
+    feedback: str | None = None
+    
     project_name: str | None = None
 
     provision_spec: ProvisioningSpec | None = None

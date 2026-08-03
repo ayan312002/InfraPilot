@@ -28,5 +28,13 @@ class ComposeValidator:
                 success=False,
                 errors=[result.stderr.strip()]
             )
-            
+
+        self.save_validation_output(state)
         return state
+
+    def save_validation_output(self, state):
+        output_file = (state.output_dir / "validation.json")
+
+        output_file.write_text(state.validation_result.model_dump_json(indent=2))
+
+        return True

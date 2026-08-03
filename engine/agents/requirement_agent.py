@@ -27,13 +27,47 @@ class RequirementAgent:
 
         {schema}
         """
-        
+        prompt = state.user_request
+        if state.feedback is None:
+
+            prompt = f"""
+            User Request:
+
+            {state.user_request}
+            """
+
+        else:
+
+            prompt = f"""
+            Original Request:
+
+            {state.user_request}
+
+            Current ProvisioningSpec:
+
+            {state.provision_spec.model_dump_json(indent=2)}
+
+            User Feedback:
+
+            {state.feedback}
+
+            Update the ProvisioningSpec.
+            """
         spec = self.llm.generate(
             system_prompt=self.system_prompt,
-            user_prompt=state.user_request,
+            user_prompt=prompt,
             response_model=ProvisioningSpec,
         )
 
         state.provision_spec = spec
 
+        self.save_spec_output(state)
+
         return state
+
+    def save_spec_output(self, state):
+        output_file = (state.output_dir / "spec.json")
+        output_file.write_text(state.provision_spec.model_dump_json(indent=2))
+
+        return True
+        
