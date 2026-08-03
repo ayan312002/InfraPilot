@@ -2,6 +2,7 @@ from pathlib import Path
 
 from engine.agents.requirement_agent import RequirementAgent
 from engine.generators.compose_generator import ComposeGenerator
+from engine.models.provision_state import ProvisionState
 from engine.models.provisioning_spec import ProvisioningSpec
 from engine.models.service_spec import ServiceSpec
 
@@ -16,24 +17,28 @@ def main():
 
     agent = RequirementAgent()
 
-    spec = agent.generate_spec(request)
+    state = ProvisionState(
+        user_request=request
+    )
+    
+    state.provision_spec = agent.generate_spec(request)
 
     print("\nGenerated ProvisioningSpec\n")
-    print(spec.model_dump_json(indent=2))
+    print(state.provision_spec.model_dump_json(indent=2))
 
+    
     runner = ProvisionRunner()
 
-    result = runner.run(spec)
+    result = runner.run(state)
 
     print()
 
-    print("Compose Path :", result["compose_yaml_path"])
-    print("Valid        :", result["validation"].success)
+    print("Compose Path :", state.generated_config_path)
+    print("Valid        :", state.validation_result.success)
 
-    if result["validation"].errors:
-        print()
-        print("Errors:")
-        for error in result["validation"].errors:
+    if state.validation_result.errors:
+        print("\nErrors:")
+        for error in state.validation_result.errors:
             print(error)
 
 if __name__ == "__main__":

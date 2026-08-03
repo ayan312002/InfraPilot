@@ -5,15 +5,16 @@ from engine.models.validation_result import ValidationResult
 
 class ComposeValidator:
 
-    def validate(self, compose_yaml_string: str) -> ValidationResult:
+    def validate(self, compose_path: str) -> ValidationResult:
+
         result = subprocess.run(
             [
                 "docker",
                 "compose",
-                "-f", "-",  # The dash "-" tells docker to read from standard input
+                "-f",
+                compose_path,
                 "config"
             ],
-            input=compose_yaml_string,  # Passes the string directly into stdin
             capture_output=True,
             text=True
         )
