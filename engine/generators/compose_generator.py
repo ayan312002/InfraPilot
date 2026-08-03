@@ -24,6 +24,7 @@ class ComposeGenerator(BaseGenerator):
             compose["services"][service.name] = self._build_service(service)
 
         state.generated_config = self._dump_yaml(compose)
+        state = self.save(state)
 
         return state
 

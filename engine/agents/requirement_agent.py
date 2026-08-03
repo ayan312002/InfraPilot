@@ -35,5 +35,14 @@ class RequirementAgent:
         )
 
         state.provision_spec = spec
+        
+        self.save_spec_output(state)
 
         return state
+
+    def save_spec_output(self, state):
+        output_file = (state.output_dir / "spec.json")
+        output_file.write_text(state.provision_spec.model_dump_json(indent=2))
+
+        return True
+        
