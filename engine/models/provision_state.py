@@ -1,9 +1,18 @@
+from enum import Enum
+
 from pydantic import BaseModel, Field
 from pathlib import Path
 
+from engine.models.execution_result import ExecutionResult
 from engine.models.provisioning_spec import ProvisioningSpec
 from engine.models.validation_result import ValidationResult
 
+class ProvisionStatus(str, Enum):
+    GENERATED = "generated"
+    VALIDATED = "validated"
+    APPROVED = "approved"
+    EXECUTED = "executed"
+    FAILED = "failed"
 
 class ProvisionState(BaseModel):
     user_request: str
@@ -20,4 +29,8 @@ class ProvisionState(BaseModel):
 
     validation_result: ValidationResult | None = None
 
-    execution_logs: list[str] = Field(default_factory=list)
+    approved: bool | None = None
+
+    status: str = ProvisionStatus.GENERATED
+
+    execution_result: ExecutionResult | None = None

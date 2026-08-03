@@ -1,45 +1,42 @@
-from pathlib import Path
-
-from engine.agents.requirement_agent import RequirementAgent
-from engine.generators.compose_generator import ComposeGenerator
 from engine.models.provision_state import ProvisionState
-from engine.models.provisioning_spec import ProvisioningSpec
-from engine.models.service_spec import ServiceSpec
-
 from engine.runner import ProvisionRunner
-from engine.utils.spec_loader import SpecLoader
-
-import json
 
 
 def main():
-    request = input("Describe your infrastructure:\n> ")
+    print("=" * 60)
+    print("InfraPilot")
+    print("Natural Language Infrastructure Provisioning")
+    print("=" * 60)
 
-    agent = RequirementAgent()
+    request = input("\nDescribe your infrastructure:\n> ")
 
-    state = ProvisionState(
-        user_request=request
-    )
-    
-    state.provision_spec = agent.generate_spec(request)
+    state = ProvisionState(user_request=request)
 
-    print("\nGenerated ProvisioningSpec\n")
-    print(state.provision_spec.model_dump_json(indent=2))
-
-    
     runner = ProvisionRunner()
+    state = runner.run(state)
 
-    result = runner.run(state)
+    print("\n" + "=" * 60)
+    print("Provisioning Summary")
+    print("=" * 60)
 
-    print()
-
-    print("Compose Path :", state.generated_config_path)
-    print("Valid        :", state.validation_result.success)
+    print(f"Project:      {state.project_name}")
+    print(f"Compose File: {state.generated_config_path}")
+    print(f"Validation:   {'✓ Passed' if state.validation_result.success else '✗ Failed'}")
+    print(f"Approved:     {'Yes' if state.approved else 'No'}")
 
     if state.validation_result.errors:
-        print("\nErrors:")
+        print("\nValidation Errors:")
         for error in state.validation_result.errors:
-            print(error)
+            print(f"  • {error}")
+
+    if state.execution_result.errors:
+        print("\nExecution Logs:")
+        for error in state.execution_result.errors:
+            print(f"  • {error}")
+
+
+    print("\nDone.")
+
 
 if __name__ == "__main__":
     main()
