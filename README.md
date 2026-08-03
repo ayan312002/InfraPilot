@@ -21,6 +21,8 @@ The current MVP targets **Docker Compose**, while the architecture is designed t
 python main.py "I need a FastAPI backend with PostgreSQL and Redis"
 ```
 
+https://github.com/user-attachments/assets/2c02325d-809e-4864-bca8-aad0222082bf
+
 ## Pipeline
 
 1. **Requirement Agent**: Converts natural language query into a structured `ProvisioningSpec`.
