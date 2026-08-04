@@ -1,7 +1,5 @@
 import json
 
-from openai import OpenAI
-
 from engine.llm.factory import LLMFactory
 from engine.models.provision_state import ProvisionState
 from engine.models.provisioning_spec import ProvisioningSpec
