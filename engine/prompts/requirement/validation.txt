@@ -1,0 +1,17 @@
+Original User Request:
+
+{user_request}
+
+Current ProvisioningSpec:
+
+{provision_spec}
+
+Validation Errors:
+
+{validation_errors}
+
+Update the ProvisioningSpec so the generated docker-compose passes validation.
+
+Only make the changes necessary to resolve the validation errors.
+
+Return the complete updated ProvisioningSpec.
