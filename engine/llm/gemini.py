@@ -1,30 +1,21 @@
 import json
-
-from openai import OpenAI
 import os
 
-from dataclasses import dataclass
-from typing import Callable
-
-@dataclass
-class Tool:
-    name: str
-    description: str
-    parameters: dict
-    func: Callable
+from openai import OpenAI
 
 
-class OpenRouterLLM:
+class GeminiLLM:
 
     def __init__(self):
+
         self.client = OpenAI(
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("GEMINI_API_KEY"),
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
         )
 
         self.model = os.getenv(
-            "OPENROUTER_MODEL",
-            "nvidia/nemotron-3-super-120b-a12b:free",
+            "GEMINI_MODEL",
+            "gemini-3.6-flash",
         )
 
     def generate(
@@ -79,13 +70,6 @@ class OpenRouterLLM:
             choice = response.choices[0]
             message = choice.message
 
-            print("finish_reason:", choice.finish_reason)
-            print("tool_calls:", message.tool_calls)
-            print("content:", message.content)
-
-            #
-            # Execute tools
-            #
             if choice.finish_reason == "tool_calls":
 
                 messages.append(message)
@@ -108,30 +92,21 @@ class OpenRouterLLM:
 
                 continue
 
-            #
-            # Model is done reasoning
-            #
             messages.append(message)
             break
 
         else:
             raise RuntimeError("Maximum tool iterations reached.")
 
-        #
-        # No structured output requested
-        #
         if response_model is None:
             return message.content
 
-        #
-        # Final formatting pass
-        #
         messages.append(
             {
                 "role": "user",
                 "content": (
-                    "Return ONLY valid JSON matching this schema. "
-                    "Do not explain your reasoning. "
+                    "Return ONLY valid JSON matching the requested schema. "
+                    "Do not explain anything. "
                     "Do not call any more tools."
                 ),
             }

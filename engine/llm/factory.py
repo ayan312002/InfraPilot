@@ -1,5 +1,6 @@
 import os
 
+from engine.llm.gemini import GeminiLLM
 from engine.llm.openrouter import OpenRouterLLM
 
 
@@ -12,5 +13,8 @@ class LLMFactory:
 
         if provider == "openrouter":
             return OpenRouterLLM()
+
+        if provider == "gemini":
+            return GeminiLLM()
 
         raise ValueError(f"Unknown provider: {provider}")

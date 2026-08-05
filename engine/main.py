@@ -29,12 +29,12 @@ def main():
 
     print_summary(state)
 
-    if state.validation_result.errors:
+    if state.validation_result and state.validation_result.errors:
         print("\nValidation Errors:")
         for error in state.validation_result.errors:
             print(f"  • {error}")
 
-    if state.execution_result.errors:
+    if state.execution_result and state.execution_result.errors:
         print("\nExecution Logs:")
         for error in state.execution_result.errors:
             print(f"  • {error}")

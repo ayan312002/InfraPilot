@@ -1,5 +1,6 @@
 from engine.agents.approval_agent import ApprovalManager
 from engine.agents.executor_agent import ExecutorAgent
+from engine.agents.image_fetcher_agent import ImageFetcherAgent
 from engine.agents.requirement_agent import RequirementAgent
 from engine.generators.compose_generator import ComposeGenerator
 from engine.models.provision_state import ProvisionState
@@ -10,6 +11,7 @@ from langgraph.graph import StateGraph, END, START
 class InfraPilotWorkflow:
     def __init__(self):
         self._requirement = RequirementAgent()
+        self._image_fetcher = ImageFetcherAgent()
         self._generator = ComposeGenerator()
         self._validator = ComposeValidator()
         self._approval = ApprovalManager()
@@ -25,6 +27,9 @@ class InfraPilotWorkflow:
         def generate_node(state: ProvisionState) -> ProvisionState:
             return self._generator.generate(state)
 
+        def image_fetch_node(state: ProvisionState) -> ProvisionState:
+            return self._image_fetcher.enrich_spec(state)
+        
         def validate_node(state: ProvisionState) -> ProvisionState:
             return self._validator.validate(state)
 
@@ -52,6 +57,7 @@ class InfraPilotWorkflow:
         workflow = StateGraph(ProvisionState)
 
         workflow.add_node("requirement", requirement_node)
+        workflow.add_node("image_fetch", image_fetch_node)
         workflow.add_node("generate", generate_node)
         workflow.add_node("validate", validate_node)
         workflow.add_node("approval", approval_node)
@@ -59,7 +65,8 @@ class InfraPilotWorkflow:
 
         workflow.add_edge(START, "requirement")
 
-        workflow.add_edge("requirement", "generate")
+        workflow.add_edge("requirement", "image_fetch")
+        workflow.add_edge("image_fetch", "generate")
         workflow.add_edge("generate", "validate")
 
         workflow.add_conditional_edges(

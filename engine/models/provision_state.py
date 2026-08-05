@@ -3,6 +3,7 @@ from enum import Enum
 from pydantic import BaseModel, Field
 from pathlib import Path
 
+from engine.models.dockerhub import DockerHubSearchResult
 from engine.models.execution_result import ExecutionResult
 from engine.models.provisioning_spec import ProvisioningSpec
 from engine.models.validation_result import ValidationResult
@@ -23,6 +24,8 @@ class ProvisionState(BaseModel):
 
     provision_spec: ProvisioningSpec | None = None
 
+    docker_search_results: dict[str, DockerHubSearchResult] = {}
+    
     output_dir: Path | None = None
 
     generated_config: str | None = None
