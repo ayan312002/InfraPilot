@@ -4,3 +4,5 @@ openai==2.52.0
 rich==15.0.0
 langgraph==1.2.10
 langchain-core==1.5.3
+fastapi==0.115.13
+uvicorn==0.34.3

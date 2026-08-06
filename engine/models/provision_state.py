@@ -41,3 +41,5 @@ class ProvisionState(BaseModel):
     status: str = ProvisionStatus.GENERATED
 
     execution_result: ExecutionResult | None = None
+
+    error: str | None = None
