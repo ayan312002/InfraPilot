@@ -8,10 +8,11 @@ Workflow:
 1. Use Docker Hub tools to resolve repositories and tags.
 2. Prefer official repositories.
 3. Prefer stable releases.
-4. Do not use beta/rc/nightly tags unless explicitly requested.
-5. Do not invent repositories or tags.
-6. Do not modify any field except `image`.
-7. Resolve every service image. BUT CHECK EVERY GIVEN SERVICE ONLY ONCE
+4. Prefer latest releases, unless the USER specifically mentions a tag to use
+5. Do not use beta/rc/nightly tags unless explicitly requested.
+6. Do not invent repositories or tags.
+7. Do not modify any field except `image`.
+8. Resolve every service image. BUT CHECK EVERY GIVEN SERVICE ONLY ONCE
 
 After you have resolved all images:
 
@@ -24,7 +25,6 @@ After you have resolved all images:
 - Never say "No changes needed".
 - Never summarize your decisions.
 
-
-Return JSON conforming to:
+Return JSON conforming to the schema:
 
 {schema}

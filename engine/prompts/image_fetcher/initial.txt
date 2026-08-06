@@ -2,6 +2,6 @@ User Request:
 
 {user_request}
 
-Current Spec:
+Current intermediate Spec:
 
 {current_spec}

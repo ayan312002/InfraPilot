@@ -3,6 +3,7 @@ import uuid
 
 from engine.graph.workflow import InfraPilotWorkflow
 from engine.models.provision_state import ProvisionState
+from ui.progress import PipelineProgress
 
 class ProvisionRunner:
 
@@ -11,7 +12,10 @@ class ProvisionRunner:
 
     def run(self, state: ProvisionState) -> ProvisionState:
         state = self.prepare_workspace(state)
-        return self.graph.run(state)
+        with PipelineProgress() as progress:
+            self.graph.set_progress(progress)
+            state = self.graph.run(state)
+        return state
 
     def prepare_workspace(self, state: ProvisionState):
         if state.project_name is None:

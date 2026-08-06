@@ -12,7 +12,7 @@ class DockerHubTool:
     BASE_URL = "https://hub.docker.com/v2"
 
     MAX_REPOSITORIES = 5
-    MAX_TAGS = 100
+    MAX_TAGS = 20
 
     @staticmethod
     def _is_useful_tag(tag: str) -> bool:
@@ -69,14 +69,48 @@ class DockerHubTool:
 
         return repositories
 
+    def _normalize_repository(self, repository: str) -> str:
+        """
+        Converts various Docker image references into a Docker Hub repository.
+
+        Examples:
+            redis                     -> library/redis
+            redis:7-alpine            -> library/redis
+            redis@sha256:abcd         -> library/redis
+            library/redis:7           -> library/redis
+            nginx:latest              -> library/nginx
+            bitnami/redis:7           -> bitnami/redis
+            docker.io/library/redis   -> library/redis
+            docker.io/bitnami/redis   -> bitnami/redis
+        """
+
+        repository = repository.strip()
+
+        # Remove registry if Docker Hub was specified
+        if repository.startswith("docker.io/"):
+            repository = repository[len("docker.io/"):]
+
+        # Remove digest
+        repository = repository.split("@", 1)[0]
+
+        # Remove tag
+        if ":" in repository:
+            last_slash = repository.rfind("/")
+            last_colon = repository.rfind(":")
+            if last_colon > last_slash:
+                repository = repository[:last_colon]
+
+        # Official images
+        if "/" not in repository:
+            repository = f"library/{repository}"
+
+        return repository
     def list_tags(self, repository: str) -> list[dict]:
         """
         Returns the newest useful tags for a repository.
         """
 
-        # Handle official Docker images
-        if "/" not in repository:
-            repository = f"library/{repository}"
+        repository = self._normalize_repository(repository)
 
         response = requests.get(
             f"{self.BASE_URL}/repositories/{repository}/tags",

@@ -129,6 +129,7 @@ What would you like to change?
 
 
 ### Future Plans:
+- Better error handling
 - Frontend dashboard for demonstration
 - Instead of running docker services locally, run the commands remotely (maybe have an option to define the endpoints for Docker Engine API?)
 - Change the scope from Docker to a IaC like Terraform

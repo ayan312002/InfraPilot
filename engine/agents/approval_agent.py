@@ -17,21 +17,31 @@ class ApprovalManager:
         print(f"\nGenerated file: {state.generated_config_path}")
         print(f"Validation: {state.validation_result.success}")
 
-        print("1. Approve")
-        print("2. Modify")
-        print("3. Cancel")
-        
-        choice = input("\nChoice: ")
+        while True:
+            print("1. Approve")
+            print("2. Modify")
+            print("3. Cancel")
+            
+            choice = input("\nChoice: ")
 
-        if choice == "1":
-            state.approved = True
+            if choice == "1":
+                state.approved = True
+                state.feedback = None
+                break
 
-        elif choice == "2":
-            state.feedback = input(
-                "\nWhat would you like to change?\n> "
-            )
+            elif choice == "2":
+                state.approved = False
+                state.feedback = input(
+                    "\nWhat would you like to change?\n> "
+                )
+                break
 
-        else:
-            state.approved = False
+            elif choice == "3":
+                state.approved = False
+                state.feedback = None
+                break
+
+            else:
+                print("Invalid choice.")
 
         return state
