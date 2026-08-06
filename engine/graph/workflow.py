@@ -8,6 +8,8 @@ from engine.validators.compose_validator import ComposeValidator
 
 from langgraph.graph import StateGraph, END, START
 
+from ui.progress import PipelineProgress
+
 class InfraPilotWorkflow:
     def __init__(self):
         self._requirement = RequirementAgent()
@@ -18,26 +20,40 @@ class InfraPilotWorkflow:
         self._executor = ExecutorAgent()
 
         self._graph = self._build()
+        self._progress = None
 
+    def set_progress(self, progress: PipelineProgress):
+        self._progress = progress
+
+    def _step(self, text: str):
+        if self._progress:
+            self._progress.step(text)
 
     def _build(self):
         def requirement_node(state: ProvisionState) -> ProvisionState:
+            self._step("Requirement Agent")
             state.retry_count += 1
             return self._requirement.generate_spec(state)
 
         def generate_node(state: ProvisionState) -> ProvisionState:
+            self._step("Compose Generator")
             return self._generator.generate(state)
 
         def image_fetch_node(state: ProvisionState) -> ProvisionState:
+            self._step("Image Fetcher Agent")
             return self._image_fetcher.enrich_spec(state)
         
         def validate_node(state: ProvisionState) -> ProvisionState:
+            self._step("Compose Validator")
             return self._validator.validate(state)
 
         def approval_node(state: ProvisionState) -> ProvisionState:
-            return self._approval.review(state)
+            self._step("Approval")
+            with self._progress.suspend():
+                return self._approval.review(state)
 
         def execute_node(state: ProvisionState) -> ProvisionState:
+            self._step("Executor")
             return self._executor.execute(state)
 
         def validation_router(state: ProvisionState):

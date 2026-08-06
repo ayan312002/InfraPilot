@@ -14,8 +14,4 @@ Rules:
 - If a port is not specified, use the service's default port.
 - Infer only obvious defaults. Do not invent additional services.
 
-Return a valid ProvisioningSpec.
-
-Return JSON that conforms to this schema:
-
-{schema}
+Return a valid ProvisioningSpec in JSON.

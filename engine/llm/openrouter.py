@@ -19,7 +19,7 @@ class OpenRouterLLM:
     def __init__(self):
         self.client = OpenAI(
             api_key=os.getenv("OPENROUTER_API_KEY"),
-            base_url="https://openrouter.ai/api/v1",
+            base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
         )
 
         self.model = os.getenv(
@@ -58,6 +58,10 @@ class OpenRouterLLM:
             kwargs = {
                 "model": self.model,
                 "messages": messages,
+                "reasoning_effort": "none",
+                "extra_body": {
+                    "chat_template_kwargs": {"enable_thinking": False}  #  Passed cleanly
+                }
             }
 
             if tools:
