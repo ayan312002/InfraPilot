@@ -15,3 +15,7 @@ Rules:
 - Infer only obvious defaults. Do not invent additional services.
 
 Return a valid ProvisioningSpec.
+
+Return JSON that conforms to this schema:
+
+{schema}

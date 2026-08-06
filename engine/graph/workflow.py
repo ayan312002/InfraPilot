@@ -22,6 +22,7 @@ class InfraPilotWorkflow:
 
     def _build(self):
         def requirement_node(state: ProvisionState) -> ProvisionState:
+            state.retry_count += 1
             return self._requirement.generate_spec(state)
 
         def generate_node(state: ProvisionState) -> ProvisionState:
@@ -40,9 +41,17 @@ class InfraPilotWorkflow:
             return self._executor.execute(state)
 
         def validation_router(state: ProvisionState):
+            MAX_RETRIES = 3
             if state.validation_result.success:
                 return "approval"
 
+            if state.retry_count < MAX_RETRIES:
+                state.retry_count += 1
+                return "requirement"
+
+            state.error = (
+                f"Validation failed after {MAX_RETRIES} attempts."
+            )
             return END
 
         def approval_router(state: ProvisionState):

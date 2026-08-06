@@ -32,6 +32,8 @@ class ProvisionState(BaseModel):
 
     generated_config_path: Path | None = None
 
+    retry_count: int = 0
+    
     validation_result: ValidationResult | None = None
 
     approved: bool | None = None

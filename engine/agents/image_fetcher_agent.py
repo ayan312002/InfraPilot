@@ -12,13 +12,11 @@ class ImageFetcherAgent:
 
     def __init__(self):
         self.llm = LLMFactory.create()
-        self.system_prompt = PromptLoader.load(
-            "image_fetcher_prompt.txt"
-        )
+        self.docker_tool = DockerHubTool()
+        self.tools = self._build_tools()
 
-        docker = DockerHubTool()
-
-        self.tools = [
+    def _build_tools(self):
+        return [
             Tool(
                 name="search_repository",
                 description="Search Docker Hub repositories.",
@@ -31,7 +29,7 @@ class ImageFetcherAgent:
                     },
                     "required": ["query"],
                 },
-                func=docker.search_repository,
+                func=self.docker_tool.search_repository,
             ),
             Tool(
                 name="list_tags",
@@ -45,47 +43,31 @@ class ImageFetcherAgent:
                     },
                     "required": ["repository"],
                 },
-                func=docker.list_tags,
+                func=self.docker_tool.list_tags,
             ),
         ]
 
-    def enrich_spec(self, state: ProvisionState):
-
+    def _build_system_prompt(self):
+        template = PromptLoader.load("image_fetcher/system.txt")
         schema = json.dumps(
             ProvisioningSpec.model_json_schema(),
-            indent=2,
+            indent=2
         )
 
-        system_prompt = self.system_prompt + f"""
+        return template.format(schema=schema)
 
-Return JSON conforming to:
+    def _build_user_prompt(self, state):
+        template = PromptLoader.load("image_fetcher/initial.txt")
 
-{schema}
-
-You have access to Docker Hub tools.
-
-Resolve every service image.
-
-Only modify image fields.
-
-Prefer stable releases.
-
-Do not use beta/rc/nightly tags unless explicitly requested.
-"""
-
-        prompt = f"""
-User Request:
-
-{state.user_request}
-
-Current Spec:
-
-{state.provision_spec.model_dump_json(indent=2)}
-"""
-
+        return template.format(
+            user_request=state.user_request,
+            current_spec=state.provision_spec.model_dump_json(indent=2)
+        )
+    
+    def enrich_spec(self, state: ProvisionState):
         updated = self.llm.generate(
-            system_prompt=system_prompt,
-            user_prompt=prompt,
+            system_prompt= self._build_system_prompt(),
+            user_prompt= self._build_user_prompt(state),
             response_model=ProvisioningSpec,
             tools=self.tools,
         )

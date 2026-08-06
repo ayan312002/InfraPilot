@@ -10,50 +10,56 @@ class RequirementAgent:
 
     def __init__(self):
         self.llm = LLMFactory.create()
-        self.system_prompt = PromptLoader.load("requirement_prompt.txt")
-
-    def generate_spec(self, state: ProvisionState) -> ProvisionState:
-
+    
+    def _build_system_prompt(self):
+        template = PromptLoader.load("requirement/system.txt")
         schema = json.dumps(
             ProvisioningSpec.model_json_schema(),
             indent=2
         )
 
-        self.system_prompt += f"""
+        return template.format(schema=schema)
 
-        Return JSON that conforms to this schema:
+    def _build_user_prompt(self, state: ProvisionState) -> str:
+        if self._is_validation_retry(state):
+            return self._validation_prompt(state)
 
-        {schema}
-        """
-        prompt = state.user_request
-        if state.feedback is None:
+        if state.feedback:
+            return self._feedback_prompt(state)
 
-            prompt = f"""
-            User Request:
+        return self._initial_prompt(state)
 
-            {state.user_request}
-            """
+    def _initial_prompt(self, state: ProvisionState) -> str:
+        template = PromptLoader.load("requirement/initial.txt")
+        return template.format(user_request=state.user_request)
+        
+    def _feedback_prompt(self, state: ProvisionState) -> str:
+        template = PromptLoader.load("requirement/feedback.txt")
+        return template.format(
+            user_request=state.user_request, 
+            provision_spec=state.provision_spec.model_dump_json(indent=2),
+            feedback=state.feedback
+        )
+    
+    def _validation_prompt(self, state: ProvisionState) -> str:
+        template = PromptLoader.load("requirement/validation.txt")
+        return template.format(
+            user_request=state.user_request,
+            provision_spec=state.provision_spec.model_dump_json(indent=2),
+            validation_errors="\n".join(state.validation_result.errors),
+        )
 
-        else:
+    def _is_validation_retry(self, state: ProvisionState) -> bool:
+        return (
+            state.validation_result is not None
+            and not state.validation_result.success
+        )
 
-            prompt = f"""
-            Original Request:
+    def generate_spec(self, state: ProvisionState) -> ProvisionState:
 
-            {state.user_request}
-
-            Current ProvisioningSpec:
-
-            {state.provision_spec.model_dump_json(indent=2)}
-
-            User Feedback:
-
-            {state.feedback}
-
-            Update the ProvisioningSpec.
-            """
         spec = self.llm.generate(
-            system_prompt=self.system_prompt,
-            user_prompt=prompt,
+            system_prompt=self._build_system_prompt(),
+            user_prompt=self._build_user_prompt(state),
             response_model=ProvisioningSpec,
         )
 
@@ -68,4 +74,3 @@ class RequirementAgent:
         output_file.write_text(state.provision_spec.model_dump_json(indent=2))
 
         return True
-        

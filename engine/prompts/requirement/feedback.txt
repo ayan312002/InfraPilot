@@ -1,0 +1,15 @@
+Original User Request:
+
+{user_request}
+
+Current ProvisioningSpec:
+
+{provision_spec}
+
+User Feedback:
+
+{feedback}
+
+Update the ProvisioningSpec.
+
+Return the complete updated ProvisioningSpec.
