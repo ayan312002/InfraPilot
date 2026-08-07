@@ -1,4 +1,8 @@
+import json
+
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from engine.api.models import (
     ApproveRequest,
@@ -93,6 +97,43 @@ async def approve_provision(
         raise HTTPException(status_code=400, detail=str(exc))
 
     return _build_response(session_id, session)
+
+
+@app.get("/provision/{session_id}/events")
+async def provision_events(
+    session_id: str,
+    svc: ProvisionService = Depends(get_service),
+):
+    """Server-Sent Events endpoint for real-time pipeline progress."""
+    queue = svc.get_event_queue(session_id)
+    if queue is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    async def event_stream():
+        sent = 0
+        while True:
+            events = list(queue)
+            new_events = events[sent:]
+            for evt in new_events:
+                yield f"data: {json.dumps(evt)}\n\n"
+            sent = len(events)
+
+            session = svc.get_session(session_id)
+            if session and session["status"] in ("completed", "failed"):
+                break
+
+            import asyncio
+            await asyncio.sleep(0.5)
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
+
+
+# Serve the frontend
+app.mount(
+    "/",
+    StaticFiles(directory="engine/api/static", html=True),
+    name="static",
+)
 
 
 if __name__ == "__main__":
