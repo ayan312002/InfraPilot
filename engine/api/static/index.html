@@ -4,35 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InfraPilot — Natural Language Infrastructure Provisioning</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <script defer src="/js/prompts.js"></script>
-  <script defer src="/js/animations.js"></script>
-  <script defer src="/js/api-client.js"></script>
-  <script defer src="/js/monaco-setup.js"></script>
-  <script defer src="/js/app.js"></script>
+  <link rel="stylesheet" href="/css/styles.css?v=5" />
+  <script defer src="/js/prompts.js?v=5"></script>
+  <script defer src="/js/animations.js?v=5"></script>
+  <script defer src="/js/api-client.js?v=5"></script>
+  <script defer src="/js/monaco-setup.js?v=5"></script>
+  <script defer src="/js/app.js?v=5"></script>
 </head>
-<body>
-  <!-- ===== Landing Page ===== -->
-  <div id="landing-screen" class="screen active">
-    <div class="landing-hero">
-      <h1 class="logo">InfraPilot</h1>
-      <p class="tagline">Natural Language → Infrastructure in seconds</p>
+  <body>
+   <!-- ===== Background Atmosphere ===== -->
+   <div class="bg-grid"></div>
+   <div class="bg-orbs" id="bg-orbs"></div>
+   <div class="bg-particles" id="bg-particles"></div>
+   <div class="bg-noise"></div>
 
-      <div class="prompt-container">
-        <textarea
-          id="prompt-input"
-          class="prompt-input"
-          placeholder="Describe your infrastructure..."
-          rows="4"
-        ></textarea>
-        <button id="generate-btn" class="generate-btn">Generate</button>
-      </div>
+   <!-- ===== Header ===== -->
+   <header class="app-header">
+     <h1 class="logo">InfraPilot</h1>
+     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+       <span class="theme-icon">🌙</span>
+     </button>
+    </header>
 
-      <div class="rotating-prompt" id="rotating-prompt"></div>
+    <!-- ===== Landing Page ===== -->
+    <div id="landing-screen" class="screen active">
+      <div class="landing-hero">
+        <div class="hero-title">
+          <h2 class="hero-heading">What will you deploy today?</h2>
+          <p class="hero-subheading">Provision services &amp; deploy them on docker with AI.</p>
+        </div>
 
-      <div class="example-library" id="example-library"></div>
-    </div>
-  </div>
+       <div class="prompt-composer">
+         <textarea
+           id="prompt-input"
+           class="prompt-input"
+           placeholder="Describe your infrastructure..."
+           rows="5"
+         ></textarea>
+         <button id="generate-btn" class="generate-btn">Generate</button>
+       </div>
+
+       <div class="rotating-prompt" id="rotating-prompt"></div>
+
+       <div class="example-library" id="example-library"></div>
+     </div>
+   </div>
 
    <!-- ===== Generation View ===== -->
    <div id="generation-screen" class="screen">
@@ -94,24 +110,36 @@
       <button class="btn btn-danger" id="cancel-btn">Cancel</button>
     </div>
 
-    <!-- ===== Feedback Modal ===== -->
-    <div class="modal-overlay" id="feedback-modal">
-      <div class="modal">
-        <h3>Regenerate with Feedback</h3>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
-          Tell us what to change and we'll regenerate the infrastructure spec.
-        </p>
-        <textarea
-          id="feedback-input"
-          placeholder="e.g. Use port 6380 instead of 6379, add environment variables..."
-        ></textarea>
-        <div class="modal-actions">
-          <button class="btn btn-outline" id="modal-cancel">Cancel</button>
-          <button class="btn btn-primary" id="modal-submit">Regenerate</button>
-        </div>
-      </div>
-    </div>
-  </div>
+     <!-- ===== Feedback Modal ===== -->
+     <div class="modal-overlay" id="feedback-modal">
+       <div class="modal">
+         <h3>Regenerate with Feedback</h3>
+         <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+           Tell us what to change and we'll regenerate the infrastructure spec.
+         </p>
+         <textarea
+           id="feedback-input"
+           placeholder="e.g. Use port 6380 instead of 6379, add environment variables..."
+         ></textarea>
+         <div class="modal-actions">
+           <button class="btn btn-outline" id="modal-cancel">Cancel</button>
+           <button class="btn btn-primary" id="modal-submit">Regenerate</button>
+         </div>
+       </div>
+     </div>
+
+     <!-- ===== Error Modal ===== -->
+     <div class="modal-overlay" id="error-modal">
+       <div class="modal modal-error">
+         <div class="error-icon">✗</div>
+         <h3>Provisioning Failed</h3>
+         <p id="error-message">An error occurred during provisioning.</p>
+         <div class="modal-actions">
+           <button class="btn btn-outline" id="error-close">Back to Home</button>
+         </div>
+       </div>
+     </div>
+   </div>
 
   <!-- ===== Result View ===== -->
   <div id="result-screen" class="screen">

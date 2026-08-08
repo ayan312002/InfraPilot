@@ -124,3 +124,35 @@ function stopSpin(element) {
   element.classList.remove("spin");
   drawCheckmark(element);
 }
+
+function createParticleField(container, count = 30) {
+  if (!container) return;
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    const size = Math.random() * 3 + 1;
+    p.style.width = `${size}px`;
+    p.style.height = `${size}px`;
+    p.style.left = `${Math.random() * 100}%`;
+    p.style.top = `${Math.random() * 100}%`;
+    p.style.opacity = Math.random() * 0.4 + 0.1;
+    p.style.animationDuration = `${Math.random() * 15 + 10}s`;
+    p.style.animationDelay = `${Math.random() * 5}s`;
+    container.appendChild(p);
+  }
+}
+
+function createOrbs(container, count = 6) {
+  if (!container) return;
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const orb = document.createElement("div");
+    orb.className = `bg-orb orb-${i + 1}`;
+    orb.style.left = `${10 + Math.random() * 80}%`;
+    orb.style.top = `${10 + Math.random() * 80}%`;
+    orb.style.animationDuration = `${Math.random() * 25 + 20}s`;
+    orb.style.animationDelay = `${Math.random() * 5}s`;
+    container.appendChild(orb);
+  }
+}

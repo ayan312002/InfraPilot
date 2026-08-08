@@ -31,15 +31,57 @@ class InfraPilotApp {
     this.init();
   }
 
-  init() {
-    this.renderExamples();
-    this.startRotatingText();
-    this.bindLandingEvents();
-    this.bindResultEvents();
-    this.bindComposeActions();
-    this.bindApprovalEvents();
-    this.renderProgressStepper();
-  }
+   init() {
+     this.initBackground();
+     this.initTheme();
+     this.renderExamples();
+     this.startRotatingText();
+     this.bindLandingEvents();
+     this.bindResultEvents();
+     this.bindComposeActions();
+     this.bindApprovalEvents();
+     this.bindThemeToggle();
+     this.bindErrorEvents();
+     this.renderProgressStepper();
+   }
+
+   /* ===== Background Atmosphere ===== */
+
+   initBackground() {
+     const orbsContainer = document.getElementById("bg-orbs");
+     const particlesContainer = document.getElementById("bg-particles");
+     if (orbsContainer) createOrbs(orbsContainer, 6);
+     if (particlesContainer) createParticleField(particlesContainer, 30);
+   }
+
+   /* ===== Theme ===== */
+
+   initTheme() {
+     const html = document.documentElement;
+     const saved = localStorage.getItem("theme");
+     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+     const initial = saved || (prefersDark ? "dark" : "light");
+     html.setAttribute("data-theme", initial);
+     this.updateThemeIcon(initial);
+   }
+
+   updateThemeIcon(theme) {
+     const icon = document.querySelector(".theme-icon");
+     if (icon) icon.textContent = theme === "dark" ? "☀️" : "🌙";
+   }
+
+   bindThemeToggle() {
+     const toggle = document.getElementById("theme-toggle");
+     if (!toggle) return;
+     toggle.addEventListener("click", () => {
+       const html = document.documentElement;
+       const current = html.getAttribute("data-theme") || "light";
+       const next = current === "light" ? "dark" : "light";
+       html.setAttribute("data-theme", next);
+       localStorage.setItem("theme", next);
+       this.updateThemeIcon(next);
+     });
+   }
 
   /* ===== View Management ===== */
 
@@ -50,10 +92,14 @@ class InfraPilotApp {
     if (screen) screen.classList.add("active");
   }
 
-  showLanding() {
-    this.showView("landing");
-    if (this.typewriterStop) this.typewriterStop();
-  }
+   showLanding() {
+     this.showView("landing");
+     if (this.typewriterStop) this.typewriterStop();
+     const promptInput = document.getElementById("prompt-input");
+     if (promptInput) promptInput.value = "";
+     const generateBtn = document.getElementById("generate-btn");
+     if (generateBtn) generateBtn.disabled = true;
+   }
 
   startGenerating() {
     this.showView("generation");
@@ -104,22 +150,25 @@ class InfraPilotApp {
   /* ===== Landing Page ===== */
 
   renderExamples() {
-    const container = document.getElementById("example-library");
-    container.innerHTML = "";
-    EXAMPLE_PROMPTS.forEach((ex, i) => {
-      const card = document.createElement("div");
-      card.className = "example-card";
-      card.innerHTML = `
-        <div class="card-title">${ex.title}</div>
-        <div class="card-desc">${ex.prompt.slice(0, 60)}...</div>
-      `;
-      card.style.animationDelay = `${i * 0.1}s`;
-      card.addEventListener("click", () => {
-        document.getElementById("prompt-input").value = ex.prompt;
-      });
-      container.appendChild(card);
-    });
-  }
+     const container = document.getElementById("example-library");
+     container.innerHTML = "";
+     EXAMPLE_PROMPTS.forEach((ex, i) => {
+       const card = document.createElement("div");
+       card.className = `example-card card-${ex.color}`;
+       card.innerHTML = `
+         <div class="card-icon">${ex.icon}</div>
+         <div class="card-title">${ex.title}</div>
+         <div class="card-desc">${ex.prompt.slice(0, 60)}...</div>
+       `;
+       card.style.animationDelay = `${i * 0.1}s`;
+        card.addEventListener("click", () => {
+          const promptInput = document.getElementById("prompt-input");
+          promptInput.value = ex.prompt;
+          promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+       container.appendChild(card);
+     });
+   }
 
   startRotatingText() {
     const el = document.getElementById("rotating-prompt");
@@ -684,10 +733,12 @@ class InfraPilotApp {
   showProvisioningError(message) {
     this.stopPolling();
     this.api.closeEvents();
-    this.showResult({
-      status: "failed",
-      error: message,
-    });
+    const modal = document.getElementById("error-modal");
+    const msgEl = document.getElementById("error-message");
+    if (modal && msgEl) {
+      msgEl.textContent = message || "An error occurred during provisioning.";
+      modal.classList.add("active");
+    }
   }
 
   updateStatus(status) {
@@ -703,6 +754,20 @@ class InfraPilotApp {
     document.getElementById("back-to-landing").addEventListener("click", () => {
       this.showLanding();
     });
+  }
+
+  /* ===== Error Events ===== */
+
+  bindErrorEvents() {
+    document.getElementById("error-close")?.addEventListener("click", () => {
+      this.hideErrorModal();
+      this.showLanding();
+    });
+  }
+
+  hideErrorModal() {
+    const modal = document.getElementById("error-modal");
+    if (modal) modal.classList.remove("active");
   }
 
   /* ===== Progress Stepper ===== */
