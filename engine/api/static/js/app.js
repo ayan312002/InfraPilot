@@ -42,7 +42,6 @@ class InfraPilotApp {
      this.bindApprovalEvents();
      this.bindThemeToggle();
      this.bindErrorEvents();
-     this.renderProgressStepper();
    }
 
    /* ===== Background Atmosphere ===== */
@@ -98,10 +97,27 @@ class InfraPilotApp {
      const promptInput = document.getElementById("prompt-input");
      if (promptInput) promptInput.value = "";
      const generateBtn = document.getElementById("generate-btn");
-     if (generateBtn) generateBtn.disabled = true;
+      if (generateBtn) generateBtn.disabled = true;
+      this.hidePromptContext();
+    }
+
+   /* ===== Prompt Context ===== */
+
+   showPromptContext(prompt) {
+     const ctx = document.getElementById("prompt-context");
+     const text = document.getElementById("prompt-text");
+     if (ctx && text) {
+       text.textContent = prompt;
+       ctx.classList.remove("hidden");
+     }
    }
 
-  startGenerating() {
+   hidePromptContext() {
+     const ctx = document.getElementById("prompt-context");
+     if (ctx) ctx.classList.add("hidden");
+   }
+
+   startGenerating() {
     this.showView("generation");
     this.resetTimeline();
     this.clearToolEvents();
@@ -152,20 +168,19 @@ class InfraPilotApp {
   renderExamples() {
      const container = document.getElementById("example-library");
      container.innerHTML = "";
-     EXAMPLE_PROMPTS.forEach((ex, i) => {
-       const card = document.createElement("div");
-       card.className = `example-card card-${ex.color}`;
-       card.innerHTML = `
-         <div class="card-icon">${ex.icon}</div>
-         <div class="card-title">${ex.title}</div>
-         <div class="card-desc">${ex.prompt.slice(0, 60)}...</div>
-       `;
+      EXAMPLE_PROMPTS.forEach((ex, i) => {
+        const card = document.createElement("div");
+        card.className = "example-card";
+        card.innerHTML = `
+          <div class="card-title">${ex.title}</div>
+          <div class="card-description">${ex.description}</div>
+        `;
        card.style.animationDelay = `${i * 0.1}s`;
-        card.addEventListener("click", () => {
-          const promptInput = document.getElementById("prompt-input");
-          promptInput.value = ex.prompt;
-          promptInput.dispatchEvent(new Event("input", { bubbles: true }));
-        });
+       card.addEventListener("click", () => {
+         const promptInput = document.getElementById("prompt-input");
+         promptInput.value = ex.prompt;
+         promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+       });
        container.appendChild(card);
      });
    }
@@ -205,6 +220,7 @@ class InfraPilotApp {
 
   startProvision(prompt) {
     if (this.typewriterStop) this.typewriterStop();
+    this.showPromptContext(prompt);
     this.startGenerating();
     this.api.startProvision({ user_request: prompt })
       .then((resp) => {
@@ -373,9 +389,10 @@ class InfraPilotApp {
 
   /* ===== View: Result ===== */
 
-  showResultView(session) {
-    this.showResult(session);
-  }
+   showResultView(session) {
+     this.hidePromptContext();
+     this.showResult(session);
+   }
 
   /* ===== Agent Timeline ===== */
 
@@ -384,7 +401,6 @@ class InfraPilotApp {
     this._lastAgent = null;
     this._lastActiveNode = null;
     this.toolEvents = [];
-    this.resetProgressStepper();
     const container = document.getElementById("agent-timeline");
     container.innerHTML = "";
     this.agents.forEach((agent, i) => {
@@ -421,12 +437,11 @@ class InfraPilotApp {
     return div;
   }
 
-  updateAgent(agentName, status) {
-    if (status === "running") {
-      this._lastAgent = agentName;
-    }
-    this.updateProgressStepper(agentName, status);
-    const mappedId = Object.keys(NODE_AGENT_MAP_INTERNAL).find(
+   updateAgent(agentName, status) {
+     if (status === "running") {
+       this._lastAgent = agentName;
+     }
+     const mappedId = Object.keys(NODE_AGENT_MAP_INTERNAL).find(
       (k) => NODE_AGENT_MAP_INTERNAL[k] === agentName
     );
     const node = mappedId
@@ -564,6 +579,11 @@ class InfraPilotApp {
     const viewer = document.getElementById("compose-viewer");
     viewer.classList.remove("hidden");
 
+    const lineCountEl = document.getElementById("compose-line-count");
+    if (lineCountEl) {
+      lineCountEl.textContent = yamlContent ? yamlContent.split("\n").length : 0;
+    }
+
     const container = document.getElementById("monaco-container");
     if (container) container.style.display = "block";
 
@@ -581,6 +601,8 @@ class InfraPilotApp {
   hideCompose() {
     const viewer = document.getElementById("compose-viewer");
     viewer.classList.add("hidden");
+    const lineCountEl = document.getElementById("compose-line-count");
+    if (lineCountEl) lineCountEl.textContent = "0";
     const container = document.getElementById("monaco-container");
     if (container) container.style.display = "none";
   }
@@ -696,20 +718,28 @@ class InfraPilotApp {
     });
   }
 
-  sendApproval(approved, feedback) {
+  async sendApproval(approved, feedback) {
     this.stopSSE();
     this.stopPolling();
-    this.startGenerating();
     this.hideApproval();
 
-    this.api.approve(this.sessionId, { approved, feedback }).then((resp) => {
+    const badge = document.getElementById("status-badge");
+    if (badge) {
+      badge.textContent = "Restarting";
+      badge.className = "status-badge processing";
+    }
+
+    try {
+      const resp = await this.api.approve(this.sessionId, { approved, feedback });
+
       this._lastAgent = null;
       this._lastActiveNode = null;
+      this.startGenerating();
       this.connectSSE();
       this.startPolling();
-    }).catch((err) => {
+    } catch (err) {
       this.showError(err.message);
-    });
+    }
   }
 
   /* ===== Error Handling ===== */
@@ -771,44 +801,7 @@ class InfraPilotApp {
   }
 
   /* ===== Progress Stepper ===== */
-
-  renderProgressStepper() {
-    const container = document.getElementById("progress-stepper");
-    if (!container) return;
-    container.innerHTML = "";
-    this.agents.forEach((agent, i) => {
-      const step = document.createElement("div");
-      step.className = "progress-step pending";
-      step.dataset.agent = agent.id;
-      step.innerHTML = `
-        <div class="step-icon">${i + 1}</div>
-        <span class="step-label">${agent.name}</span>
-      `;
-      container.appendChild(step);
-    });
-  }
-
-  updateProgressStepper(agentName, status) {
-    const container = document.getElementById("progress-stepper");
-    if (!container) return;
-    const steps = container.querySelectorAll(".progress-step");
-    steps.forEach((step) => {
-      step.classList.remove("active", "completed");
-      if (step.querySelector(".step-label").textContent === agentName) {
-        step.classList.add(status);
-        if (status === "completed") step.classList.add("completed");
-        if (status === "running") step.classList.add("active");
-      }
-    });
-  }
-
-  resetProgressStepper() {
-    const steps = document.querySelectorAll(".progress-step");
-    steps.forEach((step) => {
-      step.classList.remove("active", "completed", "failed");
-      step.classList.add("pending");
-    });
-  }
+  // Progress stepper removed — vertical agent timeline serves this purpose
 }
 
 let app;

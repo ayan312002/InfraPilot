@@ -2,64 +2,56 @@ const EXAMPLE_PROMPTS = [
   {
     id: "flask",
     title: "Flask + PostgreSQL + Redis",
+    description: "Python web app with database and cache backing",
     prompt:
       "Deploy a Flask web application with PostgreSQL database and Redis for caching. The Flask app should run on port 5000, PostgreSQL on 5432, and Redis on 6379.",
-    icon: "🐍",
-    color: "blue",
   },
   {
     id: "django",
     title: "Django + Celery",
+    description: "Python monolith with async task processing",
     prompt:
       "Deploy a Django application with Celery worker and Redis as the message broker. Django on port 8000, Celery worker for background tasks.",
-    icon: "🐍",
-    color: "purple",
   },
   {
     id: "fastapi",
     title: "FastAPI + MongoDB",
+    description: "Modern API framework with NoSQL storage",
     prompt:
       "Deploy a FastAPI application with MongoDB database. FastAPI on port 8000, MongoDB on 27017.",
-    icon: "⚡",
-    color: "cyan",
   },
   {
     id: "nodejs",
     title: "Node.js + MySQL",
+    description: "Server-side JS runtime with relational database",
     prompt:
       "Deploy a Node.js application with MySQL database. Node.js on port 3000, MySQL on 3306.",
-    icon: "🟢",
-    color: "emerald",
   },
   {
     id: "wordpress",
     title: "WordPress Stack",
+    description: "Full CMS with database and admin panel",
     prompt:
       "Deploy WordPress with MySQL database and phpMyAdmin. WordPress on port 8080, MySQL on 3306, phpMyAdmin on 8081.",
-    icon: "📝",
-    color: "orange",
   },
   {
     id: "elk",
     title: "ELK Stack",
+    description: "Log aggregation and visualization platform",
     prompt:
       "Deploy Elasticsearch, Logstash, and Kibana. Elasticsearch on port 9200, Kibana on 5601.",
-    icon: "📊",
-    color: "amber",
   },
   {
     id: "redis",
     title: "Redis Cache",
+    description: "In-memory data structure store",
     prompt: "Deploy a single Redis instance on port 6379.",
-    icon: "🟥",
-    color: "red",
   },
   {
     id: "nginx",
     title: "Nginx Web Server",
+    description: "High-performance web server and reverse proxy",
     prompt: "Deploy an Nginx web server on port 80.",
-    icon: "🟩",
-    color: "teal",
   },
 ];
 
