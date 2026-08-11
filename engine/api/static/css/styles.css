@@ -21,6 +21,9 @@
   --modal-bg: rgba(255, 255, 255, 0.75);
   --editor-bg: rgba(15, 23, 42, 0.03);
   --editor-header-bg: rgba(15, 23, 42, 0.05);
+  --node-icon-bg: rgba(255, 255, 255, 0.6);
+  --status-badge-bg: rgba(255, 255, 255, 0.5);
+  --panel-bg: rgba(255, 255, 255, 0.5);
   --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -41,8 +44,11 @@
   --hero-gradient-end: #c084fc;
   --modal-bg: rgba(15, 0, 37, 0.75);
   --editor-bg: rgba(0, 0, 0, 0.25);
-  --editor-header-bg: rgba(255, 255, 255, 0.05);
-}
+   --editor-header-bg: rgba(255, 255, 255, 0.05);
+   --node-icon-bg: rgba(255, 255, 255, 0.15);
+   --status-badge-bg: rgba(255, 255, 255, 0.1);
+   --panel-bg: rgba(15, 23, 42, 0.4);
+  }
 
 * {
   margin: 0;
@@ -485,7 +491,7 @@ html, body {
 }
 
 .prompt-text {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--text-primary);
   line-height: 1.5;
   word-break: break-word;
@@ -514,11 +520,11 @@ html, body {
 }
 
 .status-badge {
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.25rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  background: var(--glass-bg);
+  background: var(--status-badge-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: inline-flex;
@@ -543,7 +549,11 @@ html, body {
 .agent-panel {
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 0.5rem;
+  padding: 1rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
 }
 
 .agent-panel::-webkit-scrollbar {
@@ -556,6 +566,11 @@ html, body {
   gap: 1rem;
   overflow-y: auto;
   min-height: 0;
+  padding: 1rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
 }
 
 .output-panel::-webkit-scrollbar {
@@ -596,7 +611,7 @@ html, body {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: var(--glass-bg);
+  background: var(--node-icon-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(8px);
   display: flex;
@@ -683,7 +698,7 @@ html, body {
 }
 
 .node-content h3 {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 0.25rem;
@@ -705,7 +720,7 @@ html, body {
 }
 
 .node-content p {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.4;
 }

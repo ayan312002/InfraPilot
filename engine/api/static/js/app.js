@@ -475,7 +475,30 @@ class InfraPilotApp {
           path.style.animation = "drawCheck 0.5s ease-in-out forwards";
         }
       }
+    } else {
+      const spinner = node.querySelector(".spinner");
+      if (spinner) spinner.style.display = "";
+      const checkmark = node.querySelector(".checkmark-container");
+      if (checkmark) checkmark.style.display = "";
     }
+  }
+
+  resetAgentsToPending() {
+    this.agents.forEach((a) => (a.status = "pending"));
+    this._lastAgent = null;
+    this._lastActiveNode = null;
+    const nodes = document.querySelectorAll(".timeline-node");
+    nodes.forEach((node) => {
+      node.className = "timeline-node pending";
+      const spinner = node.querySelector(".spinner");
+      if (spinner) spinner.style.display = "";
+      const checkmark = node.querySelector(".checkmark-container");
+      if (checkmark) checkmark.style.display = "";
+      const path = checkmark?.querySelector("path");
+      if (path) path.style.animation = "none";
+    });
+    const toolContainer = document.getElementById("tool-events");
+    if (toolContainer) toolContainer.innerHTML = "";
   }
 
   updateAgentDetails(agentName, content) {
@@ -651,6 +674,8 @@ class InfraPilotApp {
         </div>
       `;
     } else {
+      this.resetAgentsToPending();
+      this.updateAgent("Validator", "failed");
       panel.innerHTML = `
         <div class="validation-card error">
           <div class="validation-icon">✗</div>
