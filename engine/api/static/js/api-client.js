@@ -4,11 +4,11 @@ class ApiClient {
     this.eventSource = null;
   }
 
-  async startProvision({ user_request, project_name }) {
+  async startProvision({ user_request, project_name, example_id }) {
     const resp = await fetch(`${this.baseUrl}/provision`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_request, project_name }),
+      body: JSON.stringify({ user_request, project_name, example_id }),
     });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     return resp.json();

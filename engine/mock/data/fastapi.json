@@ -1,0 +1,58 @@
+{
+  "user_request": "Deploy a FastAPI application with MongoDB database. FastAPI on port 8000, MongoDB on 27017.",
+  "feedback": null,
+  "project_name": "fastapi-demo",
+  "provision_spec": {
+    "services": [
+      {
+        "name": "fastapi",
+        "image": "tiangolo/uvicorn-gunicorn-fastapi:python3.11",
+        "container_name": null,
+        "ports": [
+          "8000:8000"
+        ],
+        "environment": {
+          "PYTHON_ENV": "production"
+        },
+        "volumes": [],
+        "depends_on": [
+          "mongodb"
+        ]
+      },
+      {
+        "name": "mongodb",
+        "image": "mongo:7",
+        "container_name": null,
+        "ports": [
+          "27017:27017"
+        ],
+        "environment": {
+          "MONGO_INITDB_ROOT_USERNAME": "admin",
+          "MONGO_INITDB_ROOT_PASSWORD": "admin123"
+        },
+        "volumes": [
+          "mongodb_data:/data/db"
+        ],
+        "depends_on": []
+      }
+    ]
+  },
+  "docker_search_results": {},
+  "generated_config": "name: fastapi-demo\nservices:\n  fastapi:\n    image: tiangolo/uvicorn-gunicorn-fastapi:python3.11\n    ports:\n      - \"8000:8000\"\n    environment:\n      PYTHON_ENV: production\n    depends_on:\n      - mongodb\n  mongodb:\n    image: mongo:7\n    ports:\n      - \"27017:27017\"\n    environment:\n      MONGO_INITDB_ROOT_USERNAME: admin\n      MONGO_INITDB_ROOT_PASSWORD: admin123\n    volumes:\n      - mongodb_data:/data/db\nvolumes:\n  mongodb_data:\n",
+  "generated_config_path": null,
+  "retry_count": 0,
+  "validation_result": {
+    "success": true,
+    "errors": [],
+    "warnings": []
+  },
+  "approved": true,
+  "status": "completed",
+  "execution_result": {
+    "success": true,
+    "errors": [],
+    "warnings": [],
+    "container_id": "c3d4e5f6789012345678abcdef012345"
+  },
+  "error": null
+}

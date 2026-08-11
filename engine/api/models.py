@@ -9,6 +9,7 @@ from engine.models.service_spec import ServiceSpec
 class ProvisionRequest(BaseModel):
     user_request: str
     project_name: str | None = None
+    example_id: str | None = None
 
 
 class ApproveRequest(BaseModel):

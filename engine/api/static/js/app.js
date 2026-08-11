@@ -16,6 +16,7 @@ class InfraPilotApp {
     this.pollTimer = null;
     this.typewriterStop = null;
     this.monacoEditor = null;
+    this._selectedExampleId = null;
     this.agents = [
       { id: "requirement", name: "Requirement Agent", desc: "Converting natural language to ProvisioningSpec", status: "pending" },
       { id: "image_fetch", name: "Image Fetcher Agent", desc: "Discovering Docker Hub images and tags", status: "pending" },
@@ -168,19 +169,24 @@ class InfraPilotApp {
   renderExamples() {
      const container = document.getElementById("example-library");
      container.innerHTML = "";
-      EXAMPLE_PROMPTS.forEach((ex, i) => {
-        const card = document.createElement("div");
-        card.className = "example-card";
-        card.innerHTML = `
-          <div class="card-title">${ex.title}</div>
-          <div class="card-description">${ex.description}</div>
-        `;
+       EXAMPLE_PROMPTS.forEach((ex, i) => {
+         const card = document.createElement("div");
+         card.className = "example-card";
+         const demoBadge = ex.is_demo
+           ? '<span class="demo-badge">Demo</span>'
+           : "";
+         card.innerHTML = `
+           <div class="card-title">${ex.title}</div>
+           ${demoBadge}
+           <div class="card-description">${ex.description}</div>
+         `;
        card.style.animationDelay = `${i * 0.1}s`;
-       card.addEventListener("click", () => {
-         const promptInput = document.getElementById("prompt-input");
-         promptInput.value = ex.prompt;
-         promptInput.dispatchEvent(new Event("input", { bubbles: true }));
-       });
+        card.addEventListener("click", () => {
+          const promptInput = document.getElementById("prompt-input");
+          promptInput.value = ex.prompt;
+          promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+          this._selectedExampleId = ex.id;
+        });
        container.appendChild(card);
      });
    }
@@ -201,7 +207,10 @@ class InfraPilotApp {
       generateBtn.disabled = !hasText;
     };
 
-    promptInput.addEventListener("input", checkPrompt);
+    promptInput.addEventListener("input", () => {
+      this._selectedExampleId = null;
+      checkPrompt();
+    });
     checkPrompt();
 
     generateBtn.addEventListener("click", () => {
@@ -222,7 +231,10 @@ class InfraPilotApp {
     if (this.typewriterStop) this.typewriterStop();
     this.showPromptContext(prompt);
     this.startGenerating();
-    this.api.startProvision({ user_request: prompt })
+    this.api.startProvision({
+        user_request: prompt,
+        example_id: this._selectedExampleId || null,
+      })
       .then((resp) => {
         this.sessionId = resp.session_id;
         this.connectSSE();

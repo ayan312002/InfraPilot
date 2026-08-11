@@ -5,6 +5,7 @@ const EXAMPLE_PROMPTS = [
     description: "Python web app with database and cache backing",
     prompt:
       "Deploy a Flask web application with PostgreSQL database and Redis for caching. The Flask app should run on port 5000, PostgreSQL on 5432, and Redis on 6379.",
+    is_demo: true,
   },
   {
     id: "django",
@@ -12,6 +13,7 @@ const EXAMPLE_PROMPTS = [
     description: "Python monolith with async task processing",
     prompt:
       "Deploy a Django application with Celery worker and Redis as the message broker. Django on port 8000, Celery worker for background tasks.",
+    is_demo: true,
   },
   {
     id: "fastapi",
@@ -19,6 +21,7 @@ const EXAMPLE_PROMPTS = [
     description: "Modern API framework with NoSQL storage",
     prompt:
       "Deploy a FastAPI application with MongoDB database. FastAPI on port 8000, MongoDB on 27017.",
+    is_demo: true,
   },
   {
     id: "nodejs",

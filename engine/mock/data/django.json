@@ -1,0 +1,81 @@
+{
+  "user_request": "Deploy a Django application with Celery worker and Redis as the message broker. Django on port 8000, Celery worker for background tasks.",
+  "feedback": null,
+  "project_name": "django-demo",
+  "provision_spec": {
+    "services": [
+      {
+        "name": "django",
+        "image": "django:5.0-slim",
+        "container_name": null,
+        "ports": [
+          "8000:8000"
+        ],
+        "environment": {
+          "DJANGO_SETTINGS_MODULE": "myproject.settings",
+          "DJANGO_ALLOWED_HOSTS": "localhost"
+        },
+        "volumes": [],
+        "depends_on": [
+          "postgres",
+          "redis"
+        ]
+      },
+      {
+        "name": "celery",
+        "image": "celery:5.4-worker",
+        "container_name": null,
+        "ports": [],
+        "environment": {},
+        "volumes": [],
+        "depends_on": [
+          "redis"
+        ]
+      },
+      {
+        "name": "postgres",
+        "image": "postgres:16",
+        "container_name": null,
+        "ports": [
+          "5432:5432"
+        ],
+        "environment": {
+          "POSTGRES_DB": "django_db",
+          "POSTGRES_USER": "django_user",
+          "POSTGRES_PASSWORD": "django_pass"
+        },
+        "volumes": [],
+        "depends_on": []
+      },
+      {
+        "name": "redis",
+        "image": "redis:7-alpine",
+        "container_name": null,
+        "ports": [
+          "6379:6379"
+        ],
+        "environment": {},
+        "volumes": [],
+        "depends_on": []
+      }
+    ]
+  },
+  "docker_search_results": {},
+  "generated_config": "name: django-demo\nservices:\n  django:\n    image: django:5.0-slim\n    ports:\n      - \"8000:8000\"\n    environment:\n      DJANGO_SETTINGS_MODULE: myproject.settings\n      DJANGO_ALLOWED_HOSTS: localhost\n    depends_on:\n      - postgres\n      - redis\n  celery:\n    image: celery:5.4-worker\n    depends_on:\n      - redis\n  postgres:\n    image: postgres:16\n    ports:\n      - \"5432:5432\"\n    environment:\n      POSTGRES_DB: django_db\n      POSTGRES_USER: django_user\n      POSTGRES_PASSWORD: django_pass\n  redis:\n    image: redis:7-alpine\n    ports:\n      - \"6379:6379\"\n",
+  "generated_config_path": null,
+  "retry_count": 0,
+  "validation_result": {
+    "success": true,
+    "errors": [],
+    "warnings": []
+  },
+  "approved": true,
+  "status": "completed",
+  "execution_result": {
+    "success": true,
+    "errors": [],
+    "warnings": [],
+    "container_id": "b2c3d4e5f6789012345678abcdef0123"
+  },
+  "error": null
+}

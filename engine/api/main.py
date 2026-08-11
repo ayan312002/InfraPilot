@@ -64,6 +64,7 @@ async def start_provision(
     session_id = await svc.start(
         user_request=req.user_request,
         project_name=req.project_name,
+        example_id=req.example_id,
     )
     return {"session_id": session_id, "status": "pending"}
 
